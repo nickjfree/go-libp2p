@@ -2,6 +2,7 @@ package swarm
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/libp2p/go-libp2p-core/network"
@@ -80,6 +81,7 @@ func (ds *dialSync) getActiveDial(p peer.ID) (*activeDial, error) {
 			cancel: cancel,
 			reqch:  make(chan dialRequest),
 		}
+		fmt.Println("creating new active dial")
 		go ds.dialWorker(p, actd.reqch)
 		ds.dials[p] = actd
 	}
@@ -102,6 +104,7 @@ func (ds *dialSync) Dial(ctx context.Context, p peer.ID) (*Conn, error) {
 		ad.refCnt--
 		if ad.refCnt == 0 {
 			ad.close()
+			fmt.Println("deleting dial")
 			delete(ds.dials, p)
 		}
 	}()
